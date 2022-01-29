@@ -7,44 +7,44 @@ class BaseResult {
     }
     flatMap<A, B, E>(op: (a: A) => Result<B, E>): Result<B, E> {
         return match(this as unknown as Result<A, E>)
-            .with({ tag: "some" }, (res) => op(res.value))
-            .with({ tag: "none" }, (res) => res)
+            .with({ tag: "ok" }, (res) => op(res.value))
+            .with({ tag: "err" }, (res) => res)
             .exhaustive()
     }
     map<A, B, E>(op: (a: A) => B): Result<B, E> {
         return match(this as unknown as Result<A, E>)
-            .with({ tag: "some" }, (res) => ok<B, E>(op(res.value)))
-            .with({ tag: "none" }, (res) => res)
+            .with({ tag: "ok" }, (res) => ok<B, E>(op(res.value)))
+            .with({ tag: "err" }, (res) => res)
             .exhaustive()
     }
     async asyncMap<A, B, E>(op: (a: A) => B): Promise<Result<B, E>> {
         return await match(this as unknown as Result<A, E>)
-            .with({ tag: "some" }, async (res) => ok<B, E>(await op(res.value)))
-            .with({ tag: "none" }, async (res) => res)
+            .with({ tag: "ok" }, async (res) => ok<B, E>(await op(res.value)))
+            .with({ tag: "err" }, async (res) => res)
             .exhaustive()
     }
     forEach<T, E>(op: (a: T) => void): void {
         match(this as unknown as Result<T, E>)
-            .with({ tag: "some" }, (res) => op(res.value))
-            .with({ tag: "none" }, (_) => _)
+            .with({ tag: "ok" }, (res) => op(res.value))
+            .with({ tag: "err" }, (_) => _)
             .exhaustive()
     }
 }
 
 class Ok<T> extends BaseResult {
-    tag: "some"
+    tag: "ok"
     value: T
     constructor(val: T) {
-        super("some")
+        super("ok")
         this.value = val
     }
 }
 
 class Err<T> extends BaseResult {
-    tag: "none"
+    tag: "err"
     value: T
     constructor(val: T) {
-        super("none")
+        super("err")
         this.value = val
     }
 }
