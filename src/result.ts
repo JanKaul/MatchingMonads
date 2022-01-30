@@ -29,6 +29,12 @@ class BaseResult {
             .with({ tag: "err" }, (_) => _)
             .exhaustive()
     }
+    async toPromise<T, E>(): Promise<T> {
+        return await match(this as unknown as Result<T, E>)
+            .with({ tag: "ok" }, x => Promise.resolve(x.value))
+            .with({ tag: "err" }, x => Promise.reject(x.value))
+            .exhaustive()
+    }
 }
 
 class Ok<T> extends BaseResult {
